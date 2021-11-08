@@ -27,7 +27,7 @@ unit uFileSystemWatcher;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, LCLVersion;
 
 //{$DEFINE DEBUG_WATCHER}
 
@@ -77,6 +77,9 @@ implementation
 
 uses
   LCLProc, LazUTF8, uDebug, uExceptions, syncobjs, fgl
+  {$IF (lcl_fullversion >= 2030000) } // LCL 2.3.0.0 and above
+  , LazMethodList
+  {$ENDIF}
   {$IF DEFINED(MSWINDOWS)}
   , Windows, JwaWinNT, JwaWinBase, DCWindows, DCStrUtils, uGlobs, DCOSUtils
   {$ELSEIF DEFINED(LINUX)}

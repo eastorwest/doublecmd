@@ -161,7 +161,11 @@ begin
   // Create pipe for user triggered fake event
   FEventPipe[0] := -1;
   FEventPipe[1] := -1;
+  {$IF (FPC_FULLVERSION >= 30200)} // FPC 3.2.X and above
+  if fpPipe(FEventPipe, 0) < 0 then
+  {$ELSE}
   if fpPipe(FEventPipe) < 0 then
+  {$ENDIF}
     Print(SysErrorMessage(fpGetErrNo))
   else begin
     // Set both ends of pipe non blocking
