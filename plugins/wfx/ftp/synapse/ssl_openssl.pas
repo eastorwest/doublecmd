@@ -161,6 +161,10 @@ type
     function GetVerifyCert: integer; override;
   end;
 
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+procedure Initialize();
+{$endif}
+
 implementation
 
 {==============================================================================}
@@ -937,8 +941,19 @@ end;
 
 {==============================================================================}
 
-initialization
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+procedure Initialize();
+begin
   if InitSSLInterface then
     SSLImplementation := TSSLOpenSSL;
+end;
 
+{$endif}
+
+initialization
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+{$else}
+  if InitSSLInterface then
+    SSLImplementation := TSSLOpenSSL;
+{$endif}
 end.

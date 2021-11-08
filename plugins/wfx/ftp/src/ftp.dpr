@@ -1,6 +1,9 @@
 library ftp;
 
 {$IFDEF FPC}
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+  {$link ../../stub.o}
+{$endif}
 {$mode delphi}{$H+}
 {$ENDIF}
 

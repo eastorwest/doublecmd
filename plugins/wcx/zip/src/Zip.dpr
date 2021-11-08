@@ -1,5 +1,9 @@
 library Zip;
 
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+  {$link ../../stub.o}
+{$endif}
+
 uses
 {$IFDEF UNIX}
   cthreads,

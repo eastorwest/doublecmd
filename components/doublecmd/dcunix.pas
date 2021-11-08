@@ -125,6 +125,10 @@ function mbFileCopyXattr(const Source, Target: String): Boolean;
 function fnmatch(const pattern: PAnsiChar; const str: PAnsiChar; flags: cint): cint; cdecl; external clib;
 {$ENDIF}
 
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+procedure Initialize();
+{$endif}
+
 implementation
 
 uses
@@ -362,8 +366,17 @@ begin
 end;
 {$ENDIF}
 
-initialization
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+procedure Initialize();
+begin
   tzset();
+end;
+{$endif}
 
+initialization
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+{$else}
+  tzset();
+{$endif}
 end.
 

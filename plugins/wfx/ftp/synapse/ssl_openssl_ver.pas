@@ -50,6 +50,10 @@ unit ssl_openssl_ver;
 
 interface
 
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+procedure Initialize();
+{$endif}
+
 implementation
 
 uses
@@ -75,6 +79,8 @@ begin
 {$ENDIF}
 end;
 
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+procedure Initialize();
 var
   Index: Integer;
 begin
@@ -92,4 +98,30 @@ begin
       end;
     end;
   end;
+end;
+{$endif}
+
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+{$else}
+var
+  Index: Integer;
+{$endif}
+begin
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+{$else}
+  if not IsSSLloaded then
+  begin
+    for Index := Low(LibVersions) to High(LibVersions) do
+    begin
+      DLLSSLName := GetLibraryName(LibSSLName, Index);
+      DLLUtilName := GetLibraryName(LibUtilName, Index);
+
+      if InitSSLInterface then
+      begin
+        SSLImplementation:= TSSLOpenSSL;
+        Break;
+      end;
+    end;
+  end;
+{$endif}
 end.

@@ -123,7 +123,11 @@ implementation
 
 uses
   IniFiles, StrUtils, FtpAdv, FtpUtils, FtpConfDlg, syncobjs, LazFileUtils,
-  LazUTF8, DCClassesUtf8, SftpSend, ScpSend, FtpProxy;
+  LazUTF8, DCClassesUtf8, SftpSend, ScpSend, FtpProxy
+  {$if defined(FREEBSD) and defined(CPUX86_64)}
+  , blcksock, libssh, DCUnix, ssl_openssl, ssl_openssl_ver
+  {$endif}
+  ;
 
 var
   DefaultIniName: String;
@@ -626,6 +630,15 @@ end;
 function FsInitW(PluginNr: Integer; pProgressProc: TProgressProcW;
   pLogProc: TLogProcW; pRequestProc: TRequestProcW): Integer; dcpcall;
 begin
+  {$if defined(FREEBSD) and defined(CPUX86_64)}
+  // manual initialization of units
+  ssl_openssl.Initialize();
+  ssl_openssl_ver.Initialize();
+  FtpFunc.ListLock := syncobjs.TCriticalSection.Create;
+  DCUnix.Initialize();
+  libssh.Initialize();
+  blcksock.Initialize();
+  {$endif}
   ProgressProc := pProgressProc;
   LogProc := pLogProc;
   RequestProc := pRequestProc;
@@ -1147,8 +1160,10 @@ begin
 end;
 
 initialization
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+{$else}
   ListLock := syncobjs.TCriticalSection.Create;
-
+{$endif}
 finalization
   FreeAndNil(ListLock);
 

@@ -1501,6 +1501,10 @@ type
     property Password: string read FPassword Write FPassword;
   end;
 
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+procedure Initialize();
+{$endif}
+
 var
   {:Selected SSL plugin. Default is @link(TSSLNone).
 
@@ -4370,8 +4374,26 @@ end;
 
 {======================================================================}
 
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+procedure Initialize();
+begin
+  {$IFDEF ONCEWINSOCK}
+    if not InitSocketInterface(DLLStackName) then
+    begin
+      e := ESynapseError.Create('Error loading Socket interface (' + DLLStackName + ')!');
+      e.ErrorCode := 0;
+      e.ErrorMessage := 'Error loading Socket interface (' + DLLStackName + ')!';
+      raise e;
+    end;
+    synsock.WSAStartup(WinsockLevel, WsaDataOnce);
+  {$ENDIF}
+end;
+{$endif}
+
 initialization
 begin
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+{$else}
 {$IFDEF ONCEWINSOCK}
   if not InitSocketInterface(DLLStackName) then
   begin
@@ -4381,6 +4403,7 @@ begin
     raise e;
   end;
   synsock.WSAStartup(WinsockLevel, WsaDataOnce);
+{$ENDIF}
 {$ENDIF}
 end;
 

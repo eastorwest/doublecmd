@@ -22,6 +22,9 @@
 
 library xpi_wdx;
 
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+  {$link ../../stub.o}
+{$endif}
 {$mode objfpc}{$H+}
 
 uses

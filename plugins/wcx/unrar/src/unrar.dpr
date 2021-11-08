@@ -1,5 +1,9 @@
 library unrar;
 
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+  {$link ../../stub.o}
+{$endif}
+
 uses
   FPCAdds, SysUtils, DynLibs, UnRARFunc, RarFunc;
 
@@ -29,6 +33,8 @@ exports
 {$R *.res}
 
 begin
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+{$else}
   ModuleHandle := LoadLibrary(_unrar);
 {$IF DEFINED(LINUX)}
   if ModuleHandle = NilHandle then
@@ -51,4 +57,5 @@ begin
       RARSetPassword := TRARSetPassword(GetProcAddress(ModuleHandle, 'RARSetPassword'));
       RARGetDllVersion := TRARGetDllVersion(GetProcAddress(ModuleHandle, 'RARGetDllVersion'));
     end;
+{$endif}
 end.

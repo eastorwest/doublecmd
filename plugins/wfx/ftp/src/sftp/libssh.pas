@@ -327,6 +327,10 @@ var
   function libssh2_sftp_readlink(sftp: PLIBSSH2_SFTP; const path: PAnsiChar; target: PAnsiChar; maxlen: cuint): cint; inline;
   function libssh2_sftp_realpath(sftp: PLIBSSH2_SFTP; const path: PAnsiChar; target: PAnsiChar; maxlen: cuint): cint; inline;
 
+  {$if defined(FREEBSD) and defined(CPUX86_64)}
+  procedure Initialize();
+  {$endif}
+
 const
   LibSSHName =
     {$IF DEFINED(MSWINDOWS)}
@@ -577,7 +581,10 @@ begin
 end;
 
 initialization
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+{$else}
   Initialize;
+{$endif}
 
 finalization
   if (libssh2 <> NilHandle) then

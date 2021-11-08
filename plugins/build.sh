@@ -11,6 +11,12 @@ set -e
 basedir=$(pwd)
 cd plugins
 
+# only for FreeBSD amd64
+if echo $(uname -a) | grep FreeBSD | grep amd64 > /dev/null; then
+  # compile "stub" for link shared library (.so)
+  as -o stub.o stub.s
+fi
+
 # WCX plugins
 $lazbuild wcx/cpio/src/cpio.lpi   $DC_ARCH
 $lazbuild wcx/deb/src/deb.lpi     $DC_ARCH

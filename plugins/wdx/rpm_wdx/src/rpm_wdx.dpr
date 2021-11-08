@@ -1,5 +1,8 @@
 library rpm_wdx;
 
+{$if defined(FREEBSD) and defined(CPUX86_64)}
+  {$link ../../stub.o}
+{$endif}
 {$MODE Delphi}
 
 { Important note about DLL memory management: ShareMem must be the

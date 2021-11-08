@@ -205,7 +205,10 @@ var
 implementation
 
 uses
-  DCBasicTypes, DCDateTimeUtils, DCConvertEncoding, DCFileAttributes;
+  DCBasicTypes, DCDateTimeUtils, DCConvertEncoding, DCFileAttributes
+  {$if defined(FREEBSD) and defined(CPUX86_64)}
+  , SysUtils
+  {$endif};
 
 type
   // From libunrar (dll.hpp)
@@ -708,6 +711,31 @@ end;
 
 procedure ExtensionInitialize(StartupInfo: PExtensionStartupInfo); dcpcall;
 begin
+  {$if defined(FREEBSD) and defined(CPUX86_64)}
+  // initialize after loading library
+  ModuleHandle := LoadLibrary(_unrar);
+{$IF DEFINED(LINUX)}
+  if ModuleHandle = NilHandle then
+    ModuleHandle := LoadLibrary(_unrar + '.5');
+{$ENDIF}
+  if ModuleHandle = NilHandle then
+    ModuleHandle := LoadLibrary(GetEnvironmentVariable('COMMANDER_PATH') + PathDelim + _unrar);
+  if ModuleHandle <> NilHandle then
+    begin
+      RAROpenArchive := TRAROpenArchive(GetProcAddress(ModuleHandle, 'RAROpenArchive'));
+      RAROpenArchiveEx := TRAROpenArchiveEx(GetProcAddress(ModuleHandle, 'RAROpenArchiveEx'));
+      RARCloseArchive := TRARCloseArchive(GetProcAddress(ModuleHandle, 'RARCloseArchive'));
+      RARReadHeader := TRARReadHeader(GetProcAddress(ModuleHandle, 'RARReadHeader'));
+      RARReadHeaderEx := TRARReadHeaderEx(GetProcAddress(ModuleHandle, 'RARReadHeaderEx'));
+      RARProcessFile := TRARProcessFile(GetProcAddress(ModuleHandle, 'RARProcessFile'));
+      RARProcessFileW := TRARProcessFileW(GetProcAddress(ModuleHandle, 'RARProcessFileW'));
+      RARSetCallback := TRARSetCallback(GetProcAddress(ModuleHandle, 'RARSetCallback'));
+      RARSetChangeVolProc := TRARSetChangeVolProc(GetProcAddress(ModuleHandle, 'RARSetChangeVolProc'));
+      RARSetProcessDataProc := TRARSetProcessDataProc(GetProcAddress(ModuleHandle, 'RARSetProcessDataProc'));
+      RARSetPassword := TRARSetPassword(GetProcAddress(ModuleHandle, 'RARSetPassword'));
+      RARGetDllVersion := TRARGetDllVersion(GetProcAddress(ModuleHandle, 'RARGetDllVersion'));
+    end;
+  {$endif}
   gStartupInfo := StartupInfo^;
   if ModuleHandle = NilHandle then
   begin
